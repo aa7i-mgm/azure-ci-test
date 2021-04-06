@@ -1,0 +1,398 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "databaseAccounts_cigrtc_uw_cdb_d_name": {
+            "defaultValue": "cigrtc-uw-cdb-d2",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[parameters('databaseAccounts_cigrtc_uw_cdb_d_name')]",
+            "location": "West US",
+            "tags": {
+                "defaultExperience": "Azure Cosmos DB for MongoDB API",
+                "hidden-cosmos-mmspecial": "",
+                "CosmosAccountType": "Non-Production"
+            },
+            "kind": "MongoDB",
+            "identity": {
+                "type": "None"
+            },
+            "properties": {
+                "publicNetworkAccess": "Enabled",
+                "enableAutomaticFailover": false,
+                "enableMultipleWriteLocations": false,
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "disableKeyBasedMetadataWriteAccess": false,
+                "enableFreeTier": false,
+                "enableAnalyticalStorage": false,
+                "createMode": "Default",
+                "databaseAccountOfferType": "Standard",
+                "networkAclBypass": "None",
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session",
+                    "maxIntervalInSeconds": 5,
+                    "maxStalenessPrefix": 100
+                },
+                "apiProperties": {
+                    "serverVersion": "3.6"
+                },
+                "locations": [
+                    {
+                        "locationName": "West US",
+                        "failoverPriority": 0,
+                        "isZoneRedundant": false
+                    }
+                ],
+                "cors": [],
+                "capabilities": [
+                    {
+                        "name": "EnableMongo"
+                    },
+                    {
+                        "name": "DisableRateLimitingResponses"
+                    }
+                ],
+                "backupPolicy": {
+                    "type": "Periodic",
+                    "periodicModeProperties": {
+                        "backupIntervalInMinutes": 1440,
+                        "backupRetentionIntervalInHours": 48,
+                        "backupStorageRedundancy": "Geo"
+                    }
+                },
+                "networkAclBypassResourceIds": []
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "master"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/batch_execution_log')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "batch_execution_log",
+                    "indexes": [
+                        {
+                            "key": {
+                                "keys": [
+                                    "_id"
+                                ]
+                            }
+                        },
+                        {
+                            "key": {
+                                "keys": [
+                                    "createdDatetime"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/customer_communication_log')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "customer_communication_log",
+                    "indexes": [
+                        {
+                            "key": {
+                                "keys": [
+                                    "_id"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/mgm_resort_settings')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "mgm_resort_settings",
+                    "indexes": [
+                        {
+                            "key": {
+                                "keys": [
+                                    "_id"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/profile_service_event_log')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "profile_service_event_log",
+                    "indexes": [
+                        {
+                            "key": {
+                                "keys": [
+                                    "_id"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/retry_config')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "retry_config",
+                    "indexes": [
+                        {
+                            "key": {
+                                "keys": [
+                                    "_id"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/rtc_communication_settings')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "rtc_communication_settings",
+                    "indexes": [
+                        {
+                            "key": {
+                                "keys": [
+                                    "_id"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/rtc_event_log')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "rtc_event_log",
+                    "indexes": [
+                        {
+                            "key": {
+                                "keys": [
+                                    "_id"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/rtc_new_member_log')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "rtc_new_member_log",
+                    "indexes": [
+                        {
+                            "key": {
+                                "keys": [
+                                    "_id"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections/throughputSettings",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/batch_execution_log/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master', 'batch_execution_log')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections/throughputSettings",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/customer_communication_log/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master', 'customer_communication_log')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections/throughputSettings",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/mgm_resort_settings/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master', 'mgm_resort_settings')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections/throughputSettings",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/profile_service_event_log/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master', 'profile_service_event_log')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections/throughputSettings",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/retry_config/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master', 'retry_config')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections/throughputSettings",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/rtc_communication_settings/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master', 'rtc_communication_settings')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections/throughputSettings",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/rtc_event_log/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master', 'rtc_event_log')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections/throughputSettings",
+            "apiVersion": "2021-03-01-preview",
+            "name": "[concat(parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), '/master/rtc_new_member_log/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master', 'rtc_new_member_log')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/mongodbDatabases', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'), 'master')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_cigrtc_uw_cdb_d_name'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
+        }
+    ]
+}
